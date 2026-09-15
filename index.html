@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MPI Informatika — Sistem Komputer | SMP Negeri 1 Kedungpring</title>
+<style>
+  :root{
+    --font-scale: 1.0;
+    --blue: #1d4ed8;
+    --blue-2: #2563eb;
+    --blue-light: #3b82f6;
+    --cyan: #06b6d4;
+    --navy: #0b1a3a;
+    --navy-2: #0f2354;
+    --ink: #10213f;
+    --orange: #f5a623;
+    --gold: #fbbf24;
+    --green: #16a34a;
+    --green-2: #15803d;
+    --red: #dc2626;
+    --white: #ffffff;
+    --paper: #f7fbff;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{
+    width:100%; height:100%;
+    font-family:'Segoe UI', 'Trebuchet MS', Verdana, Arial, sans-serif;
+    color: var(--ink);
+    overflow:hidden;
+  }
+  body{
+    background: url('bg-ruang-kelas.jpg') center/cover no-repeat fixed;
+    background-color:#f0f9ff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+    position:relative;
+  }
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background: rgba(240, 249, 255, 0.82);
+    z-index:0;
+  }
+
+  #stage-16-9{
+    position:relative;
+    z-index:1;
+    width:min(96vw, 96vh * 16 / 9);
+    height:min(96vh, 96vw * 9 / 16);
+    background: transparent;
+    border:none;
+    box-shadow:none;
+    border-radius:0;
+    aspect-ratio: 16/9;
+    overflow:hidden;
+    font-size: calc(15px * var(--font-scale, 1.0));
+    display:flex;
+    flex-direction:column;
+  }
+
+  .page{
+    display:none;
+    width:100%; height:100%;
+    flex-direction:column;
+    padding: clamp(10px, 1.8vh, 18px) clamp(14px, 2.4vh, 26px);
+    overflow:hidden;
+  }
+  .page.active{ display:flex; }
+
+  /* ============ TOP NAV ============ */
+  .topnav{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:10px;
+    margin-bottom: clamp(8px, 1.4vh, 14px);
+    flex-shrink:0;
+  }
+  .nav-left, .nav-right{ display:flex; align-items:center; gap:8px; }
+  .nav-btn{
+    display:flex; align-items:center; justify-content:center;
+    width: clamp(40px, 5.2vh, 48px); height: clamp(40px, 5.2vh, 48px);
+    border-radius:50%;
+    background: linear-gradient(145deg, var(--blue-light), var(--blue));
+    color:#fff; border:2px solid rgba(255,255,255,0.7);
+    font-size: clamp(18px, 2.3vh, 23px);
+    cursor:pointer;
+    box-shadow: 0 4px 10px rgba(29,78,216,0.35);
+    transition: transform .15s ease;
+  }
+  .nav-btn:hover{ transform: translateY(-2px) scale(1.05); }
+  .nav-btn:active{ transform: translateY(0) scale(0.96); }
+  .nav-btn.home{ background: linear-gradient(145deg, var(--orange), #e08e00); box-shadow:0 4px 10px rgba(224,142,0,0.4);}
+  .nav-pill{
+    display:flex; align-items:center; gap:6px;
+    background: rgba(255,255,255,0.85);
+    border-radius: 999px;
+    padding: 4px 10px;
+    box-shadow: 0 3px 8px rgba(15,35,84,0.12);
+    font-weight:800;
+    font-size: clamp(12px, 1.5vh, 15px);
+    color: var(--navy-2);
+  }
+  .nav-pill button{
+    border:none; background: var(--blue-light); color:#fff;
+    width:22px; height:22px; border-radius:50%; cursor:pointer;
+    font-weight:900; font-size:13px; line-height:1;
+  }
+  .page-title-bar{
+    flex:1;
+    text-align:center;
+    font-weight:800;
+    font-size: clamp(16px, 2.2vh, 22px);
+    color:#fff;
+    background: linear-gradient(90deg, var(--blue), var(--cyan));
+    padding: clamp(6px,1vh,10px) 18px;
+    border-radius: 999px;
+    box-shadow: 0 4px 12px rgba(29,78,216,0.3);
+    letter-spacing:.3px;
+  }
+
+  /* ============ SCROLLBAR KILL ============ */
+  ::-webkit-scrollbar{ display:none; }
+
+  /* ============ COVER PAGE ============ */
+  #page-cover{ justify-content:space-between; align-items:center; position:relative;}
+  .cover-header{
+    width:100%; display:flex; align-items:center; justify-content:center; gap:16px;
+    flex-shrink:0;
+  }
+  .school-capsule{
+    display:flex; align-items:center; gap:12px;
+    background: rgba(255,255,255,0.92);
+    border-radius:999px;
+    padding: 8px 22px 8px 8px;
+    box-shadow: 0 6px 18px rgba(15,35,84,0.18);
+    border: 2px solid rgba(29,78,216,0.15);
+  }
+  .school-capsule img{
+    height: clamp(50px, 6.8vh, 68px);
+    width: clamp(50px, 6.8vh, 68px);
+    object-fit:contain;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+  }
+  .school-capsule .school-text{ display:flex; flex-direction:column; line-height:1.2; }
+  .school-capsule .school-text b{ font-size: clamp(13px,1.8vh,17px); color:var(--navy-2); }
+  .school-capsule .school-text span{ font-size: clamp(10px,1.3vh,12px); color:var(--blue); font-weight:700; }
+  .badge-row{ display:flex; gap:8px; }
+  .badge-chip{
+    background: linear-gradient(135deg, var(--orange), var(--gold));
+    color:#fff; font-weight:800; font-size: clamp(10px,1.3vh,12.5px);
+    padding: 6px 14px; border-radius:999px;
+    box-shadow: 0 4px 10px rgba(245,166,35,0.35);
+    white-space:nowrap;
+  }
+
+  .cover-center{
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; gap: clamp(8px, 1.4vh, 16px);
+  }
+  .cover-kicker{
+    font-size: clamp(13px, 1.9vh, 18px);
+    font-weight:800; color: var(--blue);
+    background: rgba(255,255,255,0.85);
+    padding:5px 18px; border-radius:999px;
+    letter-spacing:.4px;
+  }
+  .cover-title{
+    font-size: clamp(2.8rem, 6.8vw, 5.2rem);
+    font-weight:900;
+    color: var(--blue);
+    line-height:1.02;
+    -webkit-text-stroke: 2px rgba(255,255,255,0.9);
+    text-shadow:
+      0 4px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff,
+      0 8px 0 rgba(29,78,216,0.15),
+      0 14px 22px rgba(15,35,84,0.35);
+    margin: 0;
+  }
+  .cover-subtitle{
+    font-size: clamp(1.4rem, 3.2vw, 2.6rem);
+    font-weight:800; color: var(--navy-2);
+    text-shadow: 0 2px 0 rgba(255,255,255,0.8);
+  }
+  .cover-tags{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  .cover-tag{
+    font-size: clamp(11px, 1.5vh, 14px); font-weight:700; color:#fff;
+    background: linear-gradient(135deg, var(--cyan), var(--blue));
+    padding: 6px 16px; border-radius:999px;
+  }
+
+  .play-btn-wrap{ margin-top: clamp(6px, 1.2vh, 12px); display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .play-btn{
+    width: clamp(60px, 8.5vh, 80px); height: clamp(60px, 8.5vh, 80px);
+    border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #ffd166, var(--orange) 60%, #d97e00 100%);
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-size: clamp(26px, 3.6vh, 36px);
+    border: 4px solid #fff;
+    cursor:pointer;
+    box-shadow: 0 0 0 0 rgba(245,166,35,0.6);
+    animation: pulseGlow 1.8s infinite;
+  }
+  @keyframes pulseGlow{
+    0%{ box-shadow: 0 0 0 0 rgba(245,166,35,0.55); transform:scale(1);}
+    70%{ box-shadow: 0 0 0 22px rgba(245,166,35,0); transform:scale(1.04);}
+    100%{ box-shadow: 0 0 0 0 rgba(245,166,35,0); transform:scale(1);}
+  }
+  .play-label{ font-weight:900; font-size: clamp(24px, 3.8vh, 36px); color: var(--blue); text-shadow:0 2px 0 #fff;}
+
+  .cover-footer{
+    width:100%; display:flex; align-items:center; justify-content:space-between;
+    flex-shrink:0;
+    background: rgba(255,255,255,0.85);
+    border-radius:16px;
+    padding: 8px 18px;
+    box-shadow: 0 4px 12px rgba(15,35,84,0.12);
+  }
+  .cover-footer .teacher-line{ font-size: clamp(11.5px, 1.5vh, 14px); font-weight:700; color:var(--navy-2);}
+  .cover-footer .motto{ font-size: clamp(11px, 1.4vh, 13px); font-weight:700; color:var(--blue); font-style:italic;}
+
+  /* ============ MENU GRID ============ */
+  .menu-grid{
+    flex:1; display:grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2,1fr);
+    gap: clamp(10px, 1.6vh, 18px);
+  }
+  .menu-card{
+    background: rgba(255,255,255,0.92);
+    border-radius:20px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap: clamp(6px,1vh,10px);
+    text-align:center;
+    padding: 10px;
+    cursor:pointer;
+    box-shadow: 0 8px 18px rgba(15,35,84,0.15), inset 0 -3px 0 rgba(15,35,84,0.06);
+    border: 2px solid rgba(29,78,216,0.08);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .menu-card:hover{ transform: translateY(-5px); box-shadow: 0 14px 26px rgba(15,35,84,0.22);}
+  .menu-card:active{ transform: translateY(-1px) scale(0.98); }
+  .icon-box{
+    width: clamp(66px, 9vh, 88px); height: clamp(66px, 9vh, 88px);
+    border-radius:22px;
+    display:flex; align-items:center; justify-content:center;
+    font-size: clamp(34px, 4.8vh, 46px);
+    color:#fff;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.18), inset 0 -4px 8px rgba(0,0,0,0.12);
+  }
+  .menu-card:nth-child(1) .icon-box{ background: linear-gradient(145deg,#60a5fa,var(--blue)); }
+  .menu-card:nth-child(2) .icon-box{ background: linear-gradient(145deg,#34d399,var(--green-2)); }
+  .menu-card:nth-child(3) .icon-box{ background: linear-gradient(145deg,#c084fc,#7c3aed); }
+  .menu-card:nth-child(4) .icon-box{ background: linear-gradient(145deg,#fbbf24,#d97706); }
+  .menu-card:nth-child(5) .icon-box{ background: linear-gradient(145deg,#22d3ee,#0891b2); }
+  .menu-card:nth-child(6) .icon-box{ background: linear-gradient(145deg,#f87171,#dc2626); }
+  .menu-card h3{ font-size: clamp(15px,2vh,20px); font-weight:800; color:var(--navy-2); }
+  .menu-card p{ font-size: clamp(11px,1.4vh,13.5px); font-weight:600; color:#4b5f8a; line-height:1.3; }
+
+  /* ============ GENERIC CARD PANEL ============ */
+  .content-panel{
+    flex:1; display:flex; flex-direction:column; overflow:hidden;
+  }
+
+  /* ---- Tujuan Pembelajaran ---- */
+  .tp-card{
+    flex:1; background: rgba(255,255,255,0.93);
+    border-radius:22px; padding: clamp(12px,2vh,20px) clamp(18px,2.6vw,30px);
+    box-shadow: 0 10px 24px rgba(15,35,84,0.15);
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+  .tp-card h2{
+    font-size: clamp(15px,2vh,20px); font-weight:800; color:var(--blue);
+    margin-bottom:6px; flex-shrink:0;
+  }
+  .tp-list{
+    flex:1; overflow:hidden;
+    display:grid; grid-template-columns: 1fr 1fr; gap: 6px clamp(14px,2vw,26px);
+    align-content:start;
+  }
+  .tp-item{
+    display:flex; align-items:flex-start; gap:8px;
+    font-size: clamp(11.5px,1.5vh,14px); font-weight:600; color:var(--ink); line-height:1.35;
+  }
+  .tp-item .tp-ico{
+    flex-shrink:0; width:20px; height:20px; border-radius:6px;
+    background: linear-gradient(145deg,var(--cyan),var(--blue)); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:900;
+    margin-top:1px;
+  }
+
+  /* ---- Materi grid ---- */
+  .materi-grid{
+    flex:1; display:grid; grid-template-columns: repeat(3,1fr); grid-template-rows: repeat(2,1fr);
+    gap: clamp(8px,1.4vh,14px);
+  }
+  .materi-card{
+    background: rgba(255,255,255,0.93);
+    border-radius:18px; padding: clamp(8px,1.2vh,12px) clamp(10px,1.4vw,14px);
+    box-shadow: 0 6px 16px rgba(15,35,84,0.13);
+    display:flex; flex-direction:column; gap:4px; overflow:hidden;
+    cursor:pointer;
+  }
+  .materi-card .m-top{ display:flex; align-items:center; gap:8px; }
+  .materi-card .m-ico{
+    width: clamp(36px,5vh,46px); height: clamp(36px,5vh,46px); border-radius:12px;
+    display:flex; align-items:center; justify-content:center; font-size: clamp(20px,2.8vh,26px);
+    color:#fff; flex-shrink:0;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  }
+  .materi-card:nth-child(1) .m-ico{ background: linear-gradient(145deg,#60a5fa,var(--blue)); }
+  .materi-card:nth-child(2) .m-ico{ background: linear-gradient(145deg,#fbbf24,#d97706); }
+  .materi-card:nth-child(3) .m-ico{ background: linear-gradient(145deg,#c084fc,#7c3aed); }
+  .materi-card:nth-child(4) .m-ico{ background: linear-gradient(145deg,#34d399,var(--green-2)); }
+  .materi-card:nth-child(5) .m-ico{ background: linear-gradient(145deg,#22d3ee,#0891b2); }
+  .materi-card:nth-child(6) .m-ico{ background: linear-gradient(145deg,#f87171,#dc2626); }
+  .materi-card h4{ font-size: clamp(13px,1.7vh,16px); font-weight:800; color:var(--navy-2); }
+  .materi-card p{ font-size: clamp(10.5px,1.35vh,12.5px); font-weight:600; color:#4b5f8a; line-height:1.32; overflow:hidden;}
+
+  /* ---- Simulasi ---- */
+  .sim-wrap{ flex:1; display:flex; gap: clamp(10px,1.4vw,16px); overflow:hidden; }
+  .sim-left{ flex:1.5; display:flex; flex-direction:column; gap:8px; overflow:hidden; }
+  .sim-right{ flex:1; display:flex; flex-direction:column; gap:8px; overflow:hidden; }
+  .sim-svg-box{
+    background: rgba(255,255,255,0.92); border-radius:18px; padding:8px;
+    box-shadow: 0 8px 18px rgba(15,35,84,0.14);
+    flex:1; display:flex; align-items:center; justify-content:center; overflow:hidden;
+  }
+  .sim-svg-box svg{ height: clamp(260px, 38vh, 420px); width:100%; }
+  .stage-btn-row{ display:flex; gap:6px; flex-wrap:wrap; }
+  .stage-btn{
+    flex:1; border:none; border-radius:12px; padding: 8px 6px; cursor:pointer;
+    font-weight:800; font-size: clamp(11px,1.4vh,13px); color:#fff;
+    background: linear-gradient(145deg,#94a3b8,#64748b);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transition: transform .12s ease;
+  }
+  .stage-btn:hover{ transform: translateY(-2px); }
+  .stage-btn.active-input{ background: linear-gradient(145deg,#34d399,var(--green-2)); }
+  .stage-btn.active-proses{ background: linear-gradient(145deg,#60a5fa,var(--blue)); }
+  .stage-btn.active-output{ background: linear-gradient(145deg,#fbbf24,#d97706); }
+  .stage-btn.active-storage{ background: linear-gradient(145deg,#c084fc,#7c3aed); }
+
+  .classify-box{
+    background: rgba(255,255,255,0.92); border-radius:18px; padding: clamp(8px,1.2vh,12px);
+    box-shadow: 0 8px 18px rgba(15,35,84,0.14);
+    flex:1; display:flex; flex-direction:column; gap:8px; overflow:hidden;
+  }
+  .classify-box h4{ font-size: clamp(12.5px,1.6vh,15px); font-weight:800; color:var(--blue); }
+  .device-chips{ display:flex; flex-wrap:wrap; gap:6px; }
+  .device-chip{
+    border:2px solid var(--blue-light); border-radius:999px; padding:5px 12px;
+    font-size: clamp(10.5px,1.35vh,12.5px); font-weight:700; color:var(--blue-2);
+    background:#eef4ff; cursor:pointer;
+  }
+  .device-chip.selected{ background: var(--blue); color:#fff; }
+  .device-chip.done{ opacity:0.35; text-decoration:line-through; cursor:default; }
+  .cat-row{ display:flex; gap:6px; flex-wrap:wrap; margin-top:auto; }
+  .cat-btn{
+    flex:1; min-width:60px; border:none; border-radius:12px; padding:8px 4px; cursor:pointer;
+    font-weight:800; font-size: clamp(10px,1.3vh,12px); color:#fff;
+  }
+  .cat-btn.input{ background: linear-gradient(145deg,#34d399,var(--green-2)); }
+  .cat-btn.proses{ background: linear-gradient(145deg,#60a5fa,var(--blue)); }
+  .cat-btn.output{ background: linear-gradient(145deg,#fbbf24,#d97706); }
+  .cat-btn.storage{ background: linear-gradient(145deg,#c084fc,#7c3aed); }
+  .classify-score{ font-size: clamp(11px,1.4vh,13px); font-weight:800; color:var(--navy-2); text-align:center;}
+
+  /* ---- Evaluasi ---- */
+  .eval-tabs{ display:flex; gap:8px; margin-bottom:8px; flex-shrink:0; }
+  .eval-tab{
+    flex:1; text-align:center; padding:7px 4px; border-radius:12px; cursor:pointer;
+    font-weight:800; font-size: clamp(11px,1.4vh,13.5px); color:var(--blue-2);
+    background:#e6f0ff; border:2px solid transparent;
+  }
+  .eval-tab.active{ background: linear-gradient(145deg,var(--blue-light),var(--blue)); color:#fff; }
+  .eval-panel{ flex:1; overflow:hidden; display:none; flex-direction:column; }
+  .eval-panel.active{ display:flex; }
+
+  .quiz-card{
+    background: rgba(255,255,255,0.93); border-radius:18px; padding: clamp(10px,1.6vh,16px) clamp(14px,2vw,20px);
+    box-shadow: 0 8px 18px rgba(15,35,84,0.14);
+    flex:1; display:flex; flex-direction:column; gap: clamp(6px,1vh,10px); overflow:hidden;
+  }
+  .quiz-progress{ font-size: clamp(11px,1.4vh,13px); font-weight:800; color:var(--blue); }
+  .quiz-question{ font-size: clamp(13.5px,1.8vh,17px); font-weight:800; color:var(--navy-2); }
+  .quiz-options{ display:grid; grid-template-columns:1fr 1fr; gap:8px; flex:1; }
+  .quiz-opt{
+    border: 2px solid var(--blue-light); border-radius:14px; background:#f2f7ff;
+    padding: 10px 16px; font-size: clamp(13px,1.7vh,16px); font-weight:700; color:var(--navy-2);
+    cursor:pointer; display:flex; align-items:center;
+    transition: background .15s, transform .1s;
+  }
+  .quiz-opt:hover{ background:#dceafe; }
+  .quiz-opt.correct{ background: var(--green); color:#fff; border-color:var(--green-2); }
+  .quiz-opt.wrong{ background: var(--red); color:#fff; border-color:#991b1b; }
+  .quiz-feedback{ font-size: clamp(12px,1.5vh,14.5px); font-weight:700; min-height:1.4em; }
+  .quiz-nav{ display:flex; justify-content:flex-end; }
+  .btn-next{
+    border:none; border-radius:999px; padding:8px 22px; font-weight:800; cursor:pointer;
+    font-size: clamp(12px,1.5vh,14px); color:#fff; background: linear-gradient(145deg,var(--orange),#d97706);
+    box-shadow:0 4px 10px rgba(217,119,6,0.35);
+  }
+
+  .tf-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .tf-btns{ display:flex; gap:8px; }
+  .btn-tf{
+    border:none; border-radius:12px; padding:8px 16px; font-weight:800; cursor:pointer; color:#fff;
+    font-size: clamp(12px,1.5vh,14px);
+  }
+  .btn-true{ background: linear-gradient(145deg,#34d399,var(--green-2)); }
+  .btn-false{ background: linear-gradient(145deg,#f87171,var(--red)); }
+
+  .match-wrap{ flex:1; display:flex; gap: clamp(10px,2vw,30px); position:relative; overflow:hidden; }
+  .match-col{ flex:1; display:flex; flex-direction:column; gap: clamp(6px,1vh,10px); justify-content:center; }
+  .match-item{
+    background:#f2f7ff; border:2px solid var(--blue-light); border-radius:12px;
+    padding: 8px 12px; font-weight:700; font-size: clamp(12px,1.55vh,14.5px); color:var(--navy-2);
+    cursor:pointer; text-align:center;
+  }
+  .match-item.selected{ background: var(--blue); color:#fff; }
+  .match-item.matched{ background: var(--green); color:#fff; cursor:default; }
+  #matchSvg{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+
+  .recap-wrap{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap: clamp(8px,1.4vh,14px);}
+  .trophy{ font-size: clamp(44px,6vh,60px); filter: drop-shadow(0 6px 10px rgba(217,119,6,0.4)); animation: trophyBounce 1.4s ease infinite;}
+  @keyframes trophyBounce{ 0%,100%{ transform:translateY(0) rotate(-4deg);} 50%{ transform:translateY(-8px) rotate(4deg);} }
+  .recap-score{ font-size: clamp(2.2rem,5vw,3.6rem); font-weight:900; color:var(--blue); }
+  .recap-breakdown{ display:flex; gap: clamp(10px,2vw,26px); }
+  .recap-chip{ background:#fff; border-radius:14px; padding:8px 16px; text-align:center; box-shadow:0 6px 14px rgba(15,35,84,0.14);}
+  .recap-chip b{ display:block; font-size: clamp(15px,2vh,20px); color:var(--blue); }
+  .recap-chip span{ font-size: clamp(10px,1.3vh,12px); font-weight:700; color:#64748b; }
+  .btn-reset{
+    border:none; border-radius:999px; padding:9px 24px; font-weight:800; cursor:pointer;
+    font-size: clamp(12px,1.5vh,14.5px); color:#fff; background: linear-gradient(145deg,#f87171,var(--red));
+    box-shadow:0 4px 10px rgba(220,38,38,0.35);
+  }
+
+  /* ---- Profil Guru ---- */
+  .profil-card{
+    flex:1; display:flex; align-items:center; gap: clamp(20px,3.4vw,44px);
+    background: rgba(255,255,255,0.93); border-radius:24px; padding: clamp(14px,2.2vh,24px) clamp(24px,3.4vw,40px);
+    box-shadow: 0 10px 24px rgba(15,35,84,0.16);
+  }
+  .profil-photo{
+    flex-shrink:0;
+    width: clamp(130px,18vh,175px); height: clamp(130px,18vh,175px);
+    border-radius:50%; overflow:hidden;
+    border: 5px solid transparent;
+    background: linear-gradient(#fff,#fff) padding-box, linear-gradient(135deg,var(--blue),var(--cyan),var(--orange)) border-box;
+    box-shadow: 0 10px 20px rgba(15,35,84,0.3);
+  }
+  .profil-photo img{ width:100%; height:100%; object-fit:cover; }
+  .profil-info{ flex:1; display:flex; flex-direction:column; gap: clamp(4px,0.8vh,8px); }
+  .profil-info h2{ font-size: clamp(20px,2.6vh,24px); font-weight:900; color:var(--navy-2); }
+  .profil-info .role{ font-size: clamp(12.5px,1.6vh,15px); font-weight:700; color:var(--blue); }
+  .profil-info .sekolah{ font-size: clamp(12px,1.5vh,14px); font-weight:600; color:#4b5f8a; }
+  .profil-quote{
+    margin-top:6px; font-size: clamp(12px,1.5vh,14.5px); font-weight:700; font-style:italic; color:var(--navy-2);
+    background:#eef4ff; border-left:4px solid var(--orange); padding:8px 14px; border-radius:8px;
+  }
+
+  /* ---- Wawasan modal ---- */
+  .modal-overlay{
+    position:absolute; inset:0; background:rgba(11,26,58,0.55); z-index:50;
+    display:none; align-items:center; justify-content:center;
+  }
+  .modal-overlay.active{ display:flex; }
+  .modal-box{
+    background:#fff; border-radius:22px; padding: clamp(16px,2.6vh,26px) clamp(20px,3vw,32px);
+    max-width:78%; box-shadow:0 20px 40px rgba(0,0,0,0.3);
+    display:flex; flex-direction:column; gap:10px; position:relative;
+  }
+  .modal-box h3{ font-size: clamp(16px,2.2vh,22px); color:var(--blue); font-weight:900;}
+  .modal-box p{ font-size: clamp(12.5px,1.6vh,15px); font-weight:600; line-height:1.5; color:var(--ink);}
+  .modal-close{
+    position:absolute; top:10px; right:10px; width:30px; height:30px; border-radius:50%;
+    background:var(--red); color:#fff; border:none; font-weight:900; cursor:pointer; font-size:15px;
+  }
+  .fact-nav{ display:flex; justify-content:flex-end; gap:8px; }
+
+  .hidden{ display:none !important; }
+
+  @media (max-width: 480px){
+    .menu-grid{ grid-template-columns: repeat(2,1fr); grid-template-rows: repeat(3,1fr); }
+    .materi-grid{ grid-template-columns: repeat(2,1fr); grid-template-rows: repeat(3,1fr); }
+    .tp-list{ grid-template-columns: 1fr; }
+    .sim-wrap{ flex-direction:column; }
+    .profil-card{ flex-direction:column; text-align:center; }
+  }
+</style>
+</head>
+<body>
+<div id="stage-16-9">
+
+  <!-- ===================== PAGE 1: COVER ===================== -->
+  <div class="page active" id="page-cover">
+    <div class="cover-header">
+      <div class="school-capsule">
+        <img src="1000266310.png" alt="Logo Sekolah" onerror="this.style.display='none'">
+        <div class="school-text">
+          <b>SMP Negeri 1 Kedungpring</b>
+          <span>Dinas Pendidikan • Kurikulum Merdeka</span>
+        </div>
+      </div>
+      <div class="badge-row">
+        <div class="badge-chip">Kurikulum Merdeka</div>
+        <div class="badge-chip">Fase D</div>
+      </div>
+    </div>
+
+    <div class="cover-center">
+      <div class="cover-kicker">Media Pembelajaran Interaktif • Informatika</div>
+      <h1 class="cover-title">Sistem Komputer</h1>
+      <div class="cover-subtitle">Mengenal Hardware, Software &amp; Brainware</div>
+      <div class="cover-tags">
+        <div class="cover-tag">Fase D — Kelas VII SMP</div>
+        <div class="cover-tag">Informatika</div>
+      </div>
+      <div class="play-btn-wrap">
+        <div class="play-btn" onclick="playClick(); showPage('menu')">▶</div>
+        <div class="play-label">MULAI</div>
+      </div>
+    </div>
+
+    <div class="cover-footer">
+      <div class="teacher-line">👨‍🏫 Disusun oleh: Handhy Widakso Anugraha, S.Kom. — SMP Negeri 1 Kedungpring</div>
+      <div class="motto">"Belajar Informatika, Membangun Masa Depan Digital"</div>
+    </div>
+  </div>
+
+  <!-- ===================== PAGE 2: MENU ===================== -->
+  <div class="page" id="page-menu">
+    <div class="topnav">
+      <div class="nav-left">
+        <div class="nav-btn home" onclick="playClick(); showPage('cover')" title="Beranda">🏠</div>
+      </div>
+      <div class="page-title-bar">Menu Utama — Sistem Komputer</div>
+      <div class="nav-right">
+        <div class="nav-pill">🔤
+          <button onclick="changeFont(-0.05)">-</button>
+          <button onclick="changeFont(0.05)">+</button>
+        </div>
+        <div class="nav-btn" id="soundBtn" onclick="toggleSound()" title="Suara">🔊</div>
+      </div>
+    </div>
+    <div class="menu-grid">
+      <div class="menu-card" onclick="playClick(); showPage('tujuan')">
+        <div class="icon-box">🎯</div>
+        <h3>Tujuan Pembelajaran</h3>
+        <p>Capaian &amp; indikator kompetensi siswa</p>
+      </div>
+      <div class="menu-card" onclick="playClick(); showPage('materi')">
+        <div class="icon-box">📖</div>
+        <h3>Materi Pembelajaran</h3>
+        <p>Eksplorasi konsep kunci sistem komputer</p>
+      </div>
+      <div class="menu-card" onclick="playClick(); showPage('simulasi')">
+        <div class="icon-box">🕹️</div>
+        <h3>Simulasi Interaktif</h3>
+        <p>Laboratorium virtual siklus kerja komputer</p>
+      </div>
+      <div class="menu-card" onclick="playClick(); showPage('evaluasi')">
+        <div class="icon-box">📝</div>
+        <h3>Evaluasi</h3>
+        <p>3 jenis uji pemahaman, 100 poin</p>
+      </div>
+      <div class="menu-card" onclick="playClick(); showPage('profil')">
+        <div class="icon-box">👨‍🏫</div>
+        <h3>Profil Guru</h3>
+        <p>Informasi fasilitator pendidik</p>
+      </div>
+      <div class="menu-card" onclick="playClick(); openFact()">
+        <div class="icon-box">💡</div>
+        <h3>Wawasan &amp; Fakta</h3>
+        <p>Fakta menarik seputar komputer</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PAGE 3: TUJUAN ===================== -->
+  <div class="page" id="page-tujuan">
+    <div class="topnav">
+      <div class="nav-left"><div class="nav-btn home" onclick="playClick(); showPage('menu')" title="Menu">🏠</div></div>
+      <div class="page-title-bar">Tujuan Pembelajaran</div>
+      <div class="nav-right"><div class="nav-btn" onclick="playClick(); showPage('cover')" title="Beranda">⌂</div></div>
+    </div>
+    <div class="tp-card">
+      <h2>🎯 Setelah mempelajari materi Sistem Komputer, peserta didik mampu:</h2>
+      <div class="tp-list">
+        <div class="tp-item"><span class="tp-ico">1</span>Menjelaskan pengertian sistem komputer sebagai kumpulan komponen yang saling berhubungan.</div>
+        <div class="tp-item"><span class="tp-ico">2</span>Mengidentifikasi komponen sistem komputer: hardware, software, dan brainware.</div>
+        <div class="tp-item"><span class="tp-ico">3</span>Menjelaskan fungsi hardware berdasarkan perannya: input, proses, output, dan penyimpanan.</div>
+        <div class="tp-item"><span class="tp-ico">4</span>Mengidentifikasi perangkat input (keyboard, mouse, scanner, mikrofon, kamera, layar sentuh).</div>
+        <div class="tp-item"><span class="tp-ico">5</span>Menjelaskan fungsi CPU sebagai perangkat pemrosesan utama.</div>
+        <div class="tp-item"><span class="tp-ico">6</span>Mengidentifikasi perangkat output (monitor, printer, speaker, proyektor).</div>
+        <div class="tp-item"><span class="tp-ico">7</span>Mengidentifikasi media penyimpanan (hard disk, SSD, flash drive, cloud storage).</div>
+        <div class="tp-item"><span class="tp-ico">8</span>Membedakan perangkat lunak sistem dan perangkat lunak aplikasi.</div>
+        <div class="tp-item"><span class="tp-ico">9</span>Menjelaskan fungsi sistem operasi dalam mengatur sumber daya komputer.</div>
+        <div class="tp-item"><span class="tp-ico">10</span>Menjelaskan hubungan hardware, software, dan brainware dalam sistem komputer.</div>
+        <div class="tp-item"><span class="tp-ico">11</span>Menjelaskan mekanisme kerja komputer: input → proses → output → storage.</div>
+        <div class="tp-item"><span class="tp-ico">12</span>Menganalisis kebutuhan perangkat sesuai aktivitas (belajar, presentasi, gambar, gim).</div>
+        <div class="tp-item"><span class="tp-ico">13</span>Menerapkan penggunaan &amp; pemeliharaan komputer secara aman dan sesuai prosedur.</div>
+        <div class="tp-item"><span class="tp-ico">14</span>Menunjukkan sikap bertanggung jawab menjaga data, privasi, dan keamanan informasi.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PAGE 4: MATERI ===================== -->
+  <div class="page" id="page-materi">
+    <div class="topnav">
+      <div class="nav-left"><div class="nav-btn home" onclick="playClick(); showPage('menu')" title="Menu">🏠</div></div>
+      <div class="page-title-bar">Materi Inti — Sistem Komputer</div>
+      <div class="nav-right"><div class="nav-btn" onclick="playClick(); showPage('cover')" title="Beranda">⌂</div></div>
+    </div>
+    <div class="materi-grid">
+      <div class="materi-card">
+        <div class="m-top"><div class="m-ico">🧩</div><h4>Apa itu Sistem Komputer?</h4></div>
+        <p>Sistem komputer adalah gabungan komponen yang saling berhubungan dan bekerja sama untuk mengolah data menjadi informasi yang berguna.</p>
+      </div>
+      <div class="materi-card">
+        <div class="m-top"><div class="m-ico">🖥️</div><h4>Perangkat Keras (Hardware)</h4></div>
+        <p>Komponen fisik komputer yang dapat disentuh, berperan sebagai input, proses, output, maupun penyimpanan data.</p>
+      </div>
+      <div class="materi-card">
+        <div class="m-top"><div class="m-ico">💿</div><h4>Perangkat Lunak (Software)</h4></div>
+        <p>Program yang mengatur kerja komputer, terdiri atas perangkat lunak sistem (sistem operasi) dan perangkat lunak aplikasi.</p>
+      </div>
+      <div class="materi-card">
+        <div class="m-top"><div class="m-ico">🧠</div><h4>Brainware (Pengguna)</h4></div>
+        <p>Manusia yang mengoperasikan, merawat, dan mengambil keputusan dalam menjalankan sebuah sistem komputer.</p>
+      </div>
+      <div class="materi-card">
+        <div class="m-top"><div class="m-ico">💾</div><h4>Media Penyimpanan</h4></div>
+        <p>Perangkat untuk menyimpan data seperti hard disk, SSD, flash drive, kartu memori, hingga cloud storage.</p>
+      </div>
+      <div class="materi-card">
+        <div class="m-top"><div class="m-ico">🔄</div><h4>Siklus Kerja Komputer</h4></div>
+        <p>Komputer bekerja melalui tahapan input → proses → output → penyimpanan (storage) secara berkelanjutan.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PAGE 5: SIMULASI ===================== -->
+  <div class="page" id="page-simulasi">
+    <div class="topnav">
+      <div class="nav-left"><div class="nav-btn home" onclick="playClick(); showPage('menu')" title="Menu">🏠</div></div>
+      <div class="page-title-bar">Simulasi — Siklus Kerja Komputer</div>
+      <div class="nav-right"><div class="nav-btn" onclick="playClick(); showPage('cover')" title="Beranda">⌂</div></div>
+    </div>
+    <div class="sim-wrap">
+      <div class="sim-left">
+        <div class="sim-svg-box">
+          <svg viewBox="0 0 640 320" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="gInput" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#6ee7b7"/><stop offset="100%" stop-color="#059669"/>
+              </linearGradient>
+              <linearGradient id="gProses" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#93c5fd"/><stop offset="100%" stop-color="#1d4ed8"/>
+              </linearGradient>
+              <linearGradient id="gOutput" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#fde68a"/><stop offset="100%" stop-color="#d97706"/>
+              </linearGradient>
+              <linearGradient id="gStorage" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#d8b4fe"/><stop offset="100%" stop-color="#7c3aed"/>
+              </linearGradient>
+            </defs>
+
+            <!-- INPUT -->
+            <rect id="boxInput" x="20" y="120" width="130" height="80" rx="18" fill="url(#gInput)" stroke="#065f46" stroke-width="4"/>
+            <text x="85" y="155" text-anchor="middle" font-size="26" fill="#fff">⌨️</text>
+            <rect x="45" y="168" width="80" height="20" rx="6" fill="white" stroke="#065f46" stroke-width="1.5"/>
+            <text x="85" y="182" text-anchor="middle" font-size="13" font-weight="800" fill="#065f46">INPUT</text>
+
+            <!-- PROSES -->
+            <rect id="boxProses" x="255" y="100" width="130" height="120" rx="18" fill="url(#gProses)" stroke="#1e3a8a" stroke-width="4"/>
+            <text x="320" y="150" text-anchor="middle" font-size="30" fill="#fff">🧠</text>
+            <rect x="278" y="168" width="84" height="20" rx="6" fill="white" stroke="#1e3a8a" stroke-width="1.5"/>
+            <text x="320" y="182" text-anchor="middle" font-size="13" font-weight="800" fill="#1e3a8a">PROSES (CPU)</text>
+
+            <!-- OUTPUT -->
+            <rect id="boxOutput" x="490" y="120" width="130" height="80" rx="18" fill="url(#gOutput)" stroke="#92400e" stroke-width="4"/>
+            <text x="555" y="155" text-anchor="middle" font-size="26" fill="#fff">🖥️</text>
+            <rect x="513" y="168" width="84" height="20" rx="6" fill="white" stroke="#92400e" stroke-width="1.5"/>
+            <text x="555" y="182" text-anchor="middle" font-size="13" font-weight="800" fill="#92400e">OUTPUT</text>
+
+            <!-- STORAGE -->
+            <rect id="boxStorage" x="255" y="245" width="130" height="60" rx="16" fill="url(#gStorage)" stroke="#5b21b6" stroke-width="4"/>
+            <text x="290" y="282" text-anchor="middle" font-size="24" fill="#fff">💾</text>
+            <rect x="315" y="266" width="58" height="18" rx="6" fill="white" stroke="#5b21b6" stroke-width="1.5"/>
+            <text x="344" y="279" text-anchor="middle" font-size="11.5" font-weight="800" fill="#5b21b6">STORAGE</text>
+
+            <!-- ARROWS -->
+            <path id="lineIP" d="M150,160 L255,160" stroke="#334155" stroke-width="5" fill="none" stroke-dasharray="8 6"/>
+            <path id="linePO" d="M385,160 L490,160" stroke="#334155" stroke-width="5" fill="none" stroke-dasharray="8 6"/>
+            <path id="linePS" d="M320,220 L320,245" stroke="#334155" stroke-width="5" fill="none" stroke-dasharray="8 6"/>
+          </svg>
+        </div>
+        <div class="stage-btn-row">
+          <button class="stage-btn" id="btnInput" onclick="playClick(); showStage('input')">1️⃣ Input</button>
+          <button class="stage-btn" id="btnProses" onclick="playClick(); showStage('proses')">2️⃣ Proses</button>
+          <button class="stage-btn" id="btnOutput" onclick="playClick(); showStage('output')">3️⃣ Output</button>
+          <button class="stage-btn" id="btnStorage" onclick="playClick(); showStage('storage')">4️⃣ Storage</button>
+        </div>
+      </div>
+      <div class="sim-right">
+        <div class="classify-box">
+          <h4>🎮 Klasifikasikan Perangkat!</h4>
+          <div class="device-chips" id="deviceChips"></div>
+          <div class="classify-score" id="classifyScore">Skor Klasifikasi: 0 / 8</div>
+          <div class="cat-row">
+            <button class="cat-btn input" onclick="checkDevice('Input')">Input</button>
+            <button class="cat-btn proses" onclick="checkDevice('Proses')">Proses</button>
+            <button class="cat-btn output" onclick="checkDevice('Output')">Output</button>
+            <button class="cat-btn storage" onclick="checkDevice('Storage')">Storage</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PAGE 6: EVALUASI ===================== -->
+  <div class="page" id="page-evaluasi">
+    <div class="topnav">
+      <div class="nav-left"><div class="nav-btn home" onclick="playClick(); showPage('menu')" title="Menu">🏠</div></div>
+      <div class="page-title-bar">Evaluasi — Total 100 Poin</div>
+      <div class="nav-right"><div class="nav-btn" onclick="playClick(); showPage('cover')" title="Beranda">⌂</div></div>
+    </div>
+    <div class="eval-tabs">
+      <div class="eval-tab active" id="tabA" onclick="showEvalTab('A')">Babak A · PG (30)</div>
+      <div class="eval-tab" id="tabB" onclick="showEvalTab('B')">Babak B · Jodohkan (40)</div>
+      <div class="eval-tab" id="tabC" onclick="showEvalTab('C')">Babak C · B/S (30)</div>
+      <div class="eval-tab" id="tabD" onclick="showEvalTab('D')">Babak D · Rekap</div>
+    </div>
+
+    <!-- BABAK A -->
+    <div class="eval-panel active" id="evalA">
+      <div class="quiz-card">
+        <div class="quiz-progress" id="progA">Soal 1 dari 3</div>
+        <div class="quiz-question" id="qA"></div>
+        <div class="quiz-options" id="optA"></div>
+        <div class="quiz-feedback" id="fbA"></div>
+        <div class="quiz-nav"><button class="btn-next" onclick="nextA()">Lanjut ▶</button></div>
+      </div>
+    </div>
+
+    <!-- BABAK B -->
+    <div class="eval-panel" id="evalB">
+      <div class="quiz-card">
+        <div class="quiz-progress">Klik istilah lalu klik definisi yang sesuai (4 pasang, 10 poin/pasang)</div>
+        <div class="match-wrap">
+          <svg id="matchSvg"></svg>
+          <div class="match-col" id="matchLeft"></div>
+          <div class="match-col" id="matchRight"></div>
+        </div>
+        <div class="quiz-feedback" id="fbB">Skor Babak B: 0 / 40</div>
+      </div>
+    </div>
+
+    <!-- BABAK C -->
+    <div class="eval-panel" id="evalC">
+      <div class="quiz-card">
+        <div class="quiz-progress" id="progC">Pernyataan 1 dari 3</div>
+        <div class="quiz-question" id="qC"></div>
+        <div class="tf-row">
+          <div class="tf-btns">
+            <button class="btn-tf btn-true" onclick="answerC(true)">✓ BENAR</button>
+            <button class="btn-tf btn-false" onclick="answerC(false)">✗ SALAH</button>
+          </div>
+          <button class="btn-next" onclick="nextC()">Lanjut ▶</button>
+        </div>
+        <div class="quiz-feedback" id="fbC"></div>
+      </div>
+    </div>
+
+    <!-- BABAK D -->
+    <div class="eval-panel" id="evalD">
+      <div class="recap-wrap">
+        <div class="trophy">🏆</div>
+        <div class="recap-score" id="recapTotal">0 / 100</div>
+        <div class="recap-breakdown">
+          <div class="recap-chip"><b id="recapA">0/30</b><span>Babak A</span></div>
+          <div class="recap-chip"><b id="recapB">0/40</b><span>Babak B</span></div>
+          <div class="recap-chip"><b id="recapC">0/30</b><span>Babak C</span></div>
+        </div>
+        <button class="btn-reset" onclick="resetEval()">🔄 Ulangi Evaluasi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PAGE 7: PROFIL GURU ===================== -->
+  <div class="page" id="page-profil">
+    <div class="topnav">
+      <div class="nav-left"><div class="nav-btn home" onclick="playClick(); showPage('menu')" title="Menu">🏠</div></div>
+      <div class="page-title-bar">Profil Guru Pengembang</div>
+      <div class="nav-right"><div class="nav-btn" onclick="playClick(); showPage('cover')" title="Beranda">⌂</div></div>
+    </div>
+    <div class="profil-card">
+      <div class="profil-photo">
+        <img src="foto.jpeg" alt="Foto Guru" onerror="this.parentElement.style.display='none'">
+      </div>
+      <div class="profil-info">
+        <h2>Handhy Widakso Anugraha, S.Kom.</h2>
+        <div class="role">Guru Mata Pelajaran Informatika</div>
+        <div class="sekolah">SMP Negeri 1 Kedungpring</div>
+        <div class="profil-quote">"Teknologi adalah alat, tapi pemikiran kritis siswa adalah kuncinya. Mari belajar Informatika dengan rasa ingin tahu yang tak pernah padam."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL WAWASAN ===================== -->
+  <div class="modal-overlay" id="factModal">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeFact()">✕</button>
+      <h3 id="factTitle">💡 Tahukah Kamu?</h3>
+      <p id="factText"></p>
+      <div class="fact-nav">
+        <button class="btn-next" onclick="playClick(); nextFact()">Fakta Lain ▶</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ========================= AUDIO (Web Audio API sintetis) ========================= */
+let soundOn = true;
+let actx = null;
+function getCtx(){ if(!actx){ actx = new (window.AudioContext||window.webkitAudioContext)(); } return actx; }
+function toggleSound(){
+  soundOn = !soundOn;
+  document.getElementById('soundBtn').textContent = soundOn ? '🔊' : '🔇';
+}
+function tone(freqStart, freqEnd, duration, type, gainVal){
+  if(!soundOn) return;
+  try{
+    const ctx = getCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freqStart, ctx.currentTime);
+    osc.frequency.linearRampToValueAtTime(freqEnd, ctx.currentTime + duration);
+    gain.gain.setValueAtTime(gainVal || 0.15, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(); osc.stop(ctx.currentTime + duration);
+  }catch(e){}
+}
+function playClick(){ tone(450, 880, 0.12, 'square', 0.08); }
+function playCorrect(){
+  if(!soundOn) return;
+  [523.25, 659.25, 783.99].forEach((f,i)=>{
+    setTimeout(()=>tone(f, f, 0.22, 'triangle', 0.12), i*90);
+  });
+}
+function playWrong(){ tone(200, 110, 0.35, 'sawtooth', 0.12); }
+
+/* ========================= NAVIGATION ========================= */
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+}
+function changeFont(delta){
+  const stage = document.getElementById('stage-16-9');
+  let current = parseFloat(getComputedStyle(stage).getPropertyValue('--font-scale')) || 1.0;
+  current = Math.min(1.25, Math.max(0.8, current + delta));
+  stage.style.setProperty('--font-scale', current);
+}
+
+/* ========================= SIMULASI: SVG STAGES ========================= */
+const stageBoxes = { input:'boxInput', proses:'boxProses', output:'boxOutput', storage:'boxStorage' };
+const stageLines = { input:[], proses:['lineIP'], output:['linePO'], storage:['linePS'] };
+function resetStageVisual(){
+  Object.values(stageBoxes).forEach(id=>{
+    document.getElementById(id).setAttribute('opacity','0.45');
+  });
+  ['btnInput','btnProses','btnOutput','btnStorage'].forEach(id=>{
+    document.getElementById(id).className = 'stage-btn';
+  });
+}
+function showStage(stage){
+  resetStageVisual();
+  document.getElementById(stageBoxes[stage]).setAttribute('opacity','1');
+  const btnMap = { input:'btnInput', proses:'btnProses', output:'btnOutput', storage:'btnStorage' };
+  document.getElementById(btnMap[stage]).className = 'stage-btn active-'+stage;
+}
+showStage('input');
+
+/* ========================= SIMULASI: DEVICE CLASSIFIER ========================= */
+const devices = [
+  {name:'Keyboard', cat:'Input'},
+  {name:'Mouse', cat:'Input'},
+  {name:'Scanner', cat:'Input'},
+  {name:'CPU', cat:'Proses'},
+  {name:'Monitor', cat:'Output'},
+  {name:'Printer', cat:'Output'},
+  {name:'Speaker', cat:'Output'},
+  {name:'SSD / Flashdisk', cat:'Storage'}
+];
+let selectedDevice = null;
+let classifyScore = 0;
+function renderDeviceChips(){
+  const wrap = document.getElementById('deviceChips');
+  wrap.innerHTML = '';
+  devices.forEach((d,i)=>{
+    const chip = document.createElement('div');
+    chip.className = 'device-chip';
+    chip.textContent = d.name;
+    chip.dataset.index = i;
+    chip.onclick = ()=>{
+      if(chip.classList.contains('done')) return;
+      document.querySelectorAll('.device-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selectedDevice = i;
+      playClick();
+    };
+    wrap.appendChild(chip);
+  });
+}
+function checkDevice(cat){
+  if(selectedDevice === null) return;
+  const chip = document.querySelector('.device-chip[data-index="'+selectedDevice+'"]');
+  if(devices[selectedDevice].cat === cat){
+    playCorrect();
+    chip.classList.add('done');
+    classifyScore++;
+  } else {
+    playWrong();
+  }
+  chip.classList.remove('selected');
+  selectedDevice = null;
+  document.getElementById('classifyScore').textContent = 'Skor Klasifikasi: '+classifyScore+' / 8';
+}
+renderDeviceChips();
+
+/* ========================= EVALUASI: BABAK A (PILIHAN GANDA) ========================= */
+const bankA = [
+  { q:'Komponen komputer yang dapat disentuh secara fisik disebut...', opts:['Software','Hardware','Brainware','Firmware'], correct:1 },
+  { q:'Perangkat yang berfungsi menjalankan instruksi dan mengolah data disebut...', opts:['Monitor','Keyboard','CPU','Speaker'], correct:2 },
+  { q:'Berikut yang termasuk perangkat lunak sistem adalah...', opts:['Microsoft Word','Sistem Operasi','Adobe Photoshop','Google Chrome'], correct:1 }
+];
+let idxA = 0, scoreA = 0, answeredA = false;
+function renderA(){
+  const item = bankA[idxA];
+  document.getElementById('progA').textContent = 'Soal '+(idxA+1)+' dari '+bankA.length;
+  document.getElementById('qA').textContent = item.q;
+  document.getElementById('fbA').textContent = '';
+  answeredA = false;
+  const optWrap = document.getElementById('optA');
+  optWrap.innerHTML = '';
+  item.opts.forEach((opt,i)=>{
+    const el = document.createElement('div');
+    el.className = 'quiz-opt';
+    el.textContent = opt;
+    el.onclick = ()=>selectA(i, el);
+    optWrap.appendChild(el);
+  });
+}
+function selectA(i, el){
+  if(answeredA) return;
+  answeredA = true;
+  const item = bankA[idxA];
+  const opts = document.querySelectorAll('#optA .quiz-opt');
+  if(i === item.correct){
+    el.classList.add('correct');
+    document.getElementById('fbA').textContent = '✅ Benar! +10 poin';
+    document.getElementById('fbA').style.color = '#16a34a';
+    scoreA += 10;
+    playCorrect();
+  } else {
+    el.classList.add('wrong');
+    opts[item.correct].classList.add('correct');
+    document.getElementById('fbA').textContent = '❌ Kurang tepat.';
+    document.getElementById('fbA').style.color = '#dc2626';
+    playWrong();
+  }
+}
+function nextA(){
+  playClick();
+  if(idxA < bankA.length - 1){ idxA++; renderA(); }
+  else { showEvalTab('B'); }
+}
+renderA();
+
+/* ========================= EVALUASI: BABAK B (MENJODOHKAN SVG) ========================= */
+const pairs = [
+  { term:'Hardware', def:'Komponen fisik komputer yang dapat disentuh' },
+  { term:'Software', def:'Program yang mengatur jalannya komputer' },
+  { term:'Brainware', def:'Manusia yang mengoperasikan komputer' },
+  { term:'CPU', def:'Otak komputer yang memproses data & instruksi' }
+];
+let leftSel = null, matchedCount = 0, scoreB = 0;
+const rightShuffled = [...pairs].sort(()=>Math.random()-0.5);
+function renderMatch(){
+  const leftWrap = document.getElementById('matchLeft');
+  const rightWrap = document.getElementById('matchRight');
+  leftWrap.innerHTML = ''; rightWrap.innerHTML = '';
+  pairs.forEach((p,i)=>{
+    const el = document.createElement('div');
+    el.className = 'match-item';
+    el.textContent = p.term;
+    el.dataset.term = p.term;
+    el.onclick = ()=>selectLeft(el, p.term);
+    leftWrap.appendChild(el);
+  });
+  rightShuffled.forEach((p,i)=>{
+    const el = document.createElement('div');
+    el.className = 'match-item';
+    el.textContent = p.def;
+    el.dataset.def = p.def;
+    el.onclick = ()=>selectRight(el, p.def);
+    rightWrap.appendChild(el);
+  });
+}
+function selectLeft(el, term){
+  if(el.classList.contains('matched')) return;
+  document.querySelectorAll('#matchLeft .match-item').forEach(e=>e.classList.remove('selected'));
+  el.classList.add('selected');
+  leftSel = { el, term };
+  playClick();
+}
+function selectRight(el, def){
+  if(!leftSel || el.classList.contains('matched')) return;
+  const correctPair = pairs.find(p=>p.term === leftSel.term);
+  if(correctPair.def === def){
+    leftSel.el.classList.remove('selected');
+    leftSel.el.classList.add('matched');
+    el.classList.add('matched');
+    drawMatchLine(leftSel.el, el);
+    scoreB += 10;
+    matchedCount++;
+    document.getElementById('fbB').textContent = 'Skor Babak B: '+scoreB+' / 40';
+    playCorrect();
+  } else {
+    playWrong();
+    document.getElementById('fbB').textContent = 'Belum tepat, coba pasangkan lagi. Skor: '+scoreB+' / 40';
+  }
+  leftSel = null;
+}
+function drawMatchLine(elA, elB){
+  const svg = document.getElementById('matchSvg');
+  const wrapRect = document.querySelector('.match-wrap').getBoundingClientRect();
+  const rA = elA.getBoundingClientRect();
+  const rB = elB.getBoundingClientRect();
+  const x1 = rA.right - wrapRect.left, y1 = rA.top + rA.height/2 - wrapRect.top;
+  const x2 = rB.left - wrapRect.left, y2 = rB.top + rB.height/2 - wrapRect.top;
+  const line = document.createElementNS('http://www.w3.org/2000/svg','path');
+  line.setAttribute('d', 'M'+x1+','+y1+' C'+(x1+40)+','+y1+' '+(x2-40)+','+y2+' '+x2+','+y2);
+  line.setAttribute('stroke', '#16a34a');
+  line.setAttribute('stroke-width', '3.5');
+  line.setAttribute('fill', 'none');
+  line.setAttribute('stroke-linecap', 'round');
+  line.setAttribute('stroke-dasharray', '260');
+  line.setAttribute('stroke-dashoffset', '260');
+  svg.appendChild(line);
+  line.animate([{strokeDashoffset:260},{strokeDashoffset:0}], {duration:400, fill:'forwards'});
+}
+renderMatch();
+
+/* ========================= EVALUASI: BABAK C (BENAR/SALAH) ========================= */
+const bankC = [
+  { q:'CPU merupakan bagian dari perangkat lunak (software).', answer:false },
+  { q:'Sistem operasi bertugas mengatur sumber daya komputer dan menyediakan layanan bagi aplikasi.', answer:true },
+  { q:'Cloud storage adalah salah satu contoh media penyimpanan data.', answer:true }
+];
+let idxC = 0, scoreC = 0, answeredC = false;
+function renderC(){
+  document.getElementById('progC').textContent = 'Pernyataan '+(idxC+1)+' dari '+bankC.length;
+  document.getElementById('qC').textContent = bankC[idxC].q;
+  document.getElementById('fbC').textContent = '';
+  answeredC = false;
+}
+function answerC(val){
+  if(answeredC) return;
+  answeredC = true;
+  if(val === bankC[idxC].answer){
+    document.getElementById('fbC').textContent = '✅ Benar! +10 poin';
+    document.getElementById('fbC').style.color = '#16a34a';
+    scoreC += 10;
+    playCorrect();
+  } else {
+    document.getElementById('fbC').textContent = '❌ Kurang tepat. Jawaban: '+(bankC[idxC].answer ? 'BENAR' : 'SALAH');
+    document.getElementById('fbC').style.color = '#dc2626';
+    playWrong();
+  }
+}
+function nextC(){
+  playClick();
+  if(idxC < bankC.length - 1){ idxC++; renderC(); }
+  else { showEvalTab('D'); }
+}
+renderC();
+
+/* ========================= EVALUASI: TABS & REKAP ========================= */
+function showEvalTab(tab){
+  document.querySelectorAll('.eval-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.eval-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab'+tab).classList.add('active');
+  document.getElementById('eval'+tab).classList.add('active');
+  if(tab === 'D'){ renderRecap(); }
+}
+function renderRecap(){
+  const total = scoreA + scoreB + scoreC;
+  document.getElementById('recapTotal').textContent = total + ' / 100';
+  document.getElementById('recapA').textContent = scoreA + '/30';
+  document.getElementById('recapB').textContent = scoreB + '/40';
+  document.getElementById('recapC').textContent = scoreC + '/30';
+}
+function resetEval(){
+  playClick();
+  idxA = 0; scoreA = 0; answeredA = false; renderA();
+  idxC = 0; scoreC = 0; answeredC = false; renderC();
+  scoreB = 0; matchedCount = 0; leftSel = null;
+  document.getElementById('matchSvg').innerHTML = '';
+  document.getElementById('fbB').textContent = 'Skor Babak B: 0 / 40';
+  renderMatch();
+  showEvalTab('A');
+}
+
+/* ========================= WAWASAN & FAKTA MENARIK ========================= */
+const facts = [
+  'CPU pertama untuk komputer pribadi, Intel 4004, hanya memiliki sekitar 2.300 transistor — sangat jauh berbeda dengan prosesor modern yang memiliki miliaran transistor.',
+  'Kata "Software" pertama kali digunakan secara tertulis oleh ahli statistik John Tukey pada tahun 1958.',
+  'Sebuah flash drive berukuran kecil kini dapat menyimpan data yang jauh lebih besar daripada komputer raksasa di era 1970-an.',
+  'Sistem operasi bekerja layaknya "manajer" yang mengatur giliran setiap program agar dapat menggunakan CPU, memori, dan perangkat lain secara bergantian.',
+  'Brainware sangat penting dalam sistem komputer — secanggih apa pun hardware dan software, tanpa manusia yang mengoperasikannya, komputer tidak dapat berfungsi dengan baik.'
+];
+let factIdx = 0;
+function openFact(){
+  factIdx = Math.floor(Math.random()*facts.length);
+  document.getElementById('factText').textContent = facts[factIdx];
+  document.getElementById('factModal').classList.add('active');
+}
+function nextFact(){
+  factIdx = (factIdx + 1) % facts.length;
+  document.getElementById('factText').textContent = facts[factIdx];
+}
+function closeFact(){
+  playClick();
+  document.getElementById('factModal').classList.remove('active');
+}
+</script>
+</body>
+</html>
